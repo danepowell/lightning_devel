@@ -1,0 +1,37 @@
+<?php
+
+/**
+ * @file
+ * Install functions for lightning_devel.
+ */
+
+use \Drupal\user\Entity\Role;
+use \Drupal\user\Entity\User;
+
+/**
+ * Implements hook_install().
+ */
+function lightning_install() {
+  // Create user accounts for each role.
+  $roles = Role::loadMultiple();
+  foreach ($roles as $role_name => $role) {
+    if ($role_name == 'anonymous') {
+      continue;
+    }
+    $user = User::create();
+    $user->setPassword($role_name);
+    $user->enforceIsNew();
+    $user->setEmail($role_name . '@example.com');
+    $user->setUsername($role_name);
+    if ($role_name != 'authenticated') {
+      $user->addRole($role_name);
+    }
+    $user->activate();
+    $user->save();
+  }
+
+  // Set user 1 password to something predictable.
+  $admin_user = \Drupal\user\Entity\User::load(1);
+  $admin_user->setPassword('admin');
+  $admin_user->save();
+}
