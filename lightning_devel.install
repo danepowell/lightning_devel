@@ -11,7 +11,7 @@ use \Drupal\user\Entity\User;
 /**
  * Implements hook_install().
  */
-function lightning_install() {
+function lightning_devel_install() {
   // Create user accounts for each role.
   $roles = Role::loadMultiple();
   foreach ($roles as $role_name => $role) {
