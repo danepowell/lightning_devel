@@ -18,11 +18,14 @@ function lightning_devel_install() {
     if ($role_name == 'anonymous') {
       continue;
     }
-    $user = User::create();
+    $user = user_load_by_name($role_name);
+    if (!$user) {
+      $user = User::create();
+      $user->enforceIsNew();
+      $user->setUsername($role_name);
+      $user->setEmail($role_name . '@example.com');
+    }
     $user->setPassword($role_name);
-    $user->enforceIsNew();
-    $user->setEmail($role_name . '@example.com');
-    $user->setUsername($role_name);
     if ($role_name != 'authenticated') {
       $user->addRole($role_name);
     }
@@ -31,7 +34,7 @@ function lightning_devel_install() {
   }
 
   // Set user 1 password to something predictable.
-  $admin_user = \Drupal\user\Entity\User::load(1);
+  $admin_user = User::load(1);
   $admin_user->setPassword('admin');
   $admin_user->save();
 }
